@@ -2,30 +2,30 @@ import React, { createContext, useContext, ReactNode } from "react";
 import { User } from "@/types/user";
 import { useAuthManager } from "@/hooks/useAuthManager";
 
-type AuthState = {
-  loading: boolean;
-  success: boolean;
-  error?: string | null;
-};
-
 export type AuthContextType = {
   user: User | null;
-  authState: AuthState;
+  status: "loading" | "authenticated" | "unauthenticated";
   signIn: (credentials: {
     email: string;
     password: string;
   }) => Promise<{ success: boolean; message?: string }>;
-
+  signUp: (userData: any) => Promise<{ success: boolean; message?: string }>;
   signOut: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { user, authState, signIn, signOut } = useAuthManager();
+  const { user, authState, signIn, signUp, signOut } = useAuthManager();
+  const status: "loading" | "authenticated" | "unauthenticated" =
+    authState.loading
+      ? "loading"
+      : authState.success
+      ? "authenticated"
+      : "unauthenticated";
 
   return (
-    <AuthContext.Provider value={{ user, authState, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, status, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

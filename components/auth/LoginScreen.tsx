@@ -1,45 +1,51 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { ControlledInput, ControlledPassword } from "@/components/forms";
-import { useAuthManager } from "@/hooks/useAuthManager";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
-  password: z.string({ required_error: "Mot de passe requis" }),
+  password: z
+    .string({ required_error: "Mot de passe requis" })
+    .min(1, "Mot de passe requis"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
-  const { signIn } = useAuthManager();
+  const { signIn, status, user } = useAuth();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     control,
     handleSubmit,
     setError,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "test@example.com",
+      password: "password123",
     },
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    const result = await signIn(data);
-
-    if (result.success) {
-      router.replace("/");
-    } else {
-      setError("root", {
-        message: result.message || "Erreur inconnue",
-      });
+    setIsSubmitting(true);
+    try {
+      const result = await signIn(data);
+      console.log("Login result:", result);
+      if (!result.success) {
+        setError("root", {
+          message: result.message || "Erreur inconnue",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -96,7 +102,7 @@ export default function LoginScreen() {
         </TouchableOpacity>
         <View className="w-full  flex flex-row gap-3 items-center justify-end">
           <Text className="flex text-lg font-medium">Pas de compte ?</Text>
-          <TouchableOpacity onPress={() => router.push("/register")}>
+          <TouchableOpacity onPress={() => router.push("/auth/register")}>
             <Text className="flex text-center text-lg text-blue-600 font-medium">
               s'inscrire
             </Text>

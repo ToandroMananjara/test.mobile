@@ -1,42 +1,34 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Slot, useRouter, useSegments } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
-import { View, ActivityIndicator } from "react-native";
+import { useRouter, useSegments } from "expo-router";
+import { useEffect, useState } from "react";
+import { View, ActivityIndicator, Text } from "react-native";
 
-const PUBLIC_ROUTES = ["login", "register"];
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, authState } = useAuth();
-  const segments = useSegments();
+  const { user, status } = useAuth();
   const router = useRouter();
-
-  const [canRender, setCanRender] = useState(false);
-
-  const currentRoute = useMemo(() => {
-    if (!Array.isArray(segments) || !segments[0]) return "/";
-    return segments[segments.length - 1];
-  }, [segments]);
-
-  const isPublicRoute = ["login", "register"].includes(currentRoute);
+  const segments = useSegments();
+  const [hasNavigated, setHasNavigated] = useState(false);
 
   useEffect(() => {
-    if (authState.loading) return;
-
-    if (!user && !isPublicRoute) {
-      if (currentRoute !== "login") router.replace("/login");
-      setCanRender(false);
+    if (status === "loading") {
       return;
     }
 
-    if (user && isPublicRoute) {
-      if (currentRoute !== "/") router.replace("/");
-      setCanRender(false);
+    const inAuthGroup = segments[0] === "auth";
+    const isAuthenticated = status === "authenticated" && user;
+
+    if (hasNavigated) {
       return;
     }
 
-    setCanRender(true);
-  }, [user, authState.loading, currentRoute, isPublicRoute, router]);
+    if (isAuthenticated && inAuthGroup) {
+      setHasNavigated(true);
+      router.replace("/(tabs)");
+      setTimeout(() => setHasNavigated(false), 1000);
+    }
+  }, [user, status, segments, router, hasNavigated]);
 
-  if (authState.loading || !canRender) {
+  if (status === "loading") {
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#007bff" />

@@ -12,12 +12,11 @@ import "react-native-reanimated";
 import "../global.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/components/useColorScheme";
-import AuthGuard from "@/guards/AuthGuard";
 
 export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
-  initialRouteName: "(tabs)",
+  initialRouteName: "auth",
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -54,12 +53,11 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <AuthGuard>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        </Stack>
-      </AuthGuard>
+      <Stack>
+        <Stack.Screen name="auth" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+      </Stack>
     </ThemeProvider>
   );
 }

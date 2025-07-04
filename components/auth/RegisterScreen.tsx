@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import { ControlledInput, ControlledPassword } from "@/components/forms";
 import { FormStepperWrapper } from "@/components/forms/FormStepperWrapper";
 import { AccountSchema, AccountSchemaValues } from "@/schemas/account.schema";
-import { useAuthManager } from "@/hooks/useAuthManager";
+import { useAuth } from "@/contexts/AuthContext";
 
 const passwordRules = [
   { label: "Au moins 8 caractères", test: (v: string) => v.length >= 8 },
@@ -132,7 +132,7 @@ function StepProfile() {
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const { signUp } = useAuthManager();
+  const { signUp } = useAuth();
 
   const methods = useForm<AccountSchemaValues>({
     resolver: zodResolver(AccountSchema),
@@ -151,7 +151,7 @@ export default function RegisterScreen() {
     const result = await signUp(data);
     if (result.success) {
       console.log("User Creer");
-      router.replace("/login");
+      router.replace("/auth/login");
     }
   };
 
@@ -182,8 +182,8 @@ export default function RegisterScreen() {
         <View className="flex-row justify-center mt-4">
           <Text className="flex text-lg text-gray-600">Déjà un compte ? </Text>
           <Text
-            className="flex text-lg text-blue-600 font-semibold"
-            onPress={() => router.replace("/login")}
+            className="flex text-lg text-blue-6070 font-semibold"
+            onPress={() => router.replace("/auth/login")}
           >
             Se connecter
           </Text>

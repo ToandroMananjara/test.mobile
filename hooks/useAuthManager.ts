@@ -1,24 +1,45 @@
 import { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSession } from "./useSession";
 import { mockUsers } from "../data/users";
 import { User } from "@/types/user";
+
 type AuthState = {
   loading: boolean;
   success: boolean;
   error?: string | null;
 };
+
 export function useAuthManager() {
-  const [user, setUser] = useState<User | null>(null);
+  const { data, status, update, clear } = useSession();
   const [authState, setAuthState] = useState<AuthState>({
     loading: false,
     success: false,
     error: null,
   });
+
+  useEffect(() => {
+    setAuthState({
+      loading: status === "loading",
+      success: status === "authenticated",
+      error: null,
+    });
+  }, [status]);
+
   const signUp = async (data: any) => {
     setAuthState({ loading: true, success: false, error: null });
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const existingUser = mockUsers.find((u) => u.email === data.email);
+      if (existingUser) {
+        setAuthState({
+          loading: false,
+          success: false,
+          error: "Cet email est déjà utilisé",
+        });
+        return { success: false, message: "Cet email est déjà utilisé" };
+      }
 
       console.log("User signed up with data:", data);
 
@@ -46,23 +67,32 @@ export function useAuthManager() {
     email: string;
     password: string;
   }) => {
-    const userByEmail = mockUsers.find((user) => user.email === email);
+    setAuthState({ loading: true, success: false, error: null });
 
     try {
-      setAuthState({ loading: true, success: false, error: null });
+      const userByEmail = mockUsers.find((user) => user.email === email);
+
       if (!userByEmail) {
+        setAuthState({
+          loading: false,
+          success: false,
+          error: "L'email n'existe pas",
+        });
         return { success: false, message: "L'email n'existe pas" };
       }
 
       if (userByEmail.password !== password) {
+        setAuthState({
+          loading: false,
+          success: false,
+          error: "Mot de passe incorrect",
+        });
         return { success: false, message: "Mot de passe incorrect" };
       }
+      await update(userByEmail);
 
-      await AsyncStorage.setItem("user", JSON.stringify(userByEmail));
-      setUser(userByEmail);
       setAuthState({ loading: false, success: true, error: null });
-
-      return { success: true };
+      return { success: true, data: userByEmail };
     } catch (error) {
       console.error("Error during signin:", error);
       setAuthState({
@@ -75,43 +105,23 @@ export function useAuthManager() {
   };
 
   const signOut = async () => {
-    await AsyncStorage.removeItem("user");
-    setUser(null);
-  };
-
-  const loadUser = async () => {
-    console.log("load user");
-
     setAuthState({ loading: true, success: false, error: null });
     try {
-      const stored = await AsyncStorage.getItem("user");
-      if (stored) {
-        setUser(JSON.parse(stored));
-      }
-
-      // Simulate a delay for loading
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setAuthState({ loading: false, success: true, error: null });
+      await clear();
+      setAuthState({ loading: false, success: false, error: null });
+      console.log("User signed out");
     } catch (error) {
-      console.error("Error loading user:", error);
+      console.error("Error during signout:", error);
       setAuthState({
         loading: false,
         success: false,
-        error: "Une erreur est survenue lors du chargement de l'utilisateur",
+        error: "Une erreur est survenue lors de la déconnexion",
       });
-
-      return;
-    } finally {
-      setAuthState({ loading: false, success: true, error: null });
     }
   };
 
-  useEffect(() => {
-    loadUser();
-  }, []);
-
   return {
-    user,
+    user: data?.user || null,
     authState,
     signIn,
     signUp,
