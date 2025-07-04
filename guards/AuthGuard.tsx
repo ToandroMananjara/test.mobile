@@ -10,7 +10,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [hasNavigated, setHasNavigated] = useState(false);
 
   useEffect(() => {
+    console.log("=== AuthGuard useEffect triggered ===");
+    console.log("status:", status);
+    console.log("user:", user);
+    console.log("segments:", segments);
+
     if (status === "loading") {
+      console.log("Still loading, waiting...");
       return;
     }
 
@@ -18,6 +24,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const isAuthenticated = status === "authenticated" && user;
 
     if (hasNavigated) {
+      console.log("Already navigated, skipping...");
       return;
     }
 
@@ -25,6 +32,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       setHasNavigated(true);
       router.replace("/(tabs)");
       setTimeout(() => setHasNavigated(false), 1000);
+    } else if (!isAuthenticated && !inAuthGroup) {
+      setHasNavigated(true);
+      router.replace("/auth/login");
     }
   }, [user, status, segments, router, hasNavigated]);
 

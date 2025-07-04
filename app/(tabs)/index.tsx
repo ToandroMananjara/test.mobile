@@ -1,11 +1,9 @@
-import { Text, View } from "react-native";
-import EditScreenInfo from "@/components/EditScreenInfo";
+import { View, Text } from "react-native";
 
-export default function TabOneScreen() {
-  console.log("Home page");
+export default function HomeScreen() {
   return (
-    <View className="flex-1 items-center justify-center bg-gradient-to-b from-blue-50 to-indigo-100">
-      <Text>Bienvenue sur l'app gestion de produit</Text>
+    <View className="flex-1 bg-gray-50">
+      <Text>liste des produits</Text>
     </View>
   );
 }

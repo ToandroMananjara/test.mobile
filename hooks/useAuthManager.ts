@@ -105,18 +105,12 @@ export function useAuthManager() {
   };
 
   const signOut = async () => {
-    setAuthState({ loading: true, success: false, error: null });
     try {
       await clear();
-      setAuthState({ loading: false, success: false, error: null });
       console.log("User signed out");
     } catch (error) {
       console.error("Error during signout:", error);
-      setAuthState({
-        loading: false,
-        success: false,
-        error: "Une erreur est survenue lors de la déconnexion",
-      });
+      throw error; // Relancer l'erreur pour que le caller puisse la gérer
     }
   };
 
