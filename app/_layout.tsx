@@ -13,7 +13,6 @@ import "../global.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/components/useColorScheme";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
 export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {

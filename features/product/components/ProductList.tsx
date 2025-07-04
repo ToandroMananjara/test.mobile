@@ -4,12 +4,12 @@ import { ProductCard } from "./ProductCard";
 import { Pagination } from "@/components/Pagination";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { FontAwesome } from "@expo/vector-icons";
-import { useColorScheme } from "@/components/useColorScheme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProducts } from "@/hooks/useProducts";
 import { router } from "expo-router";
+import { useColorScheme } from "@/components/useColorScheme";
 
-const ProductList: React.FC = () => {
+export default function ProductList() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
@@ -65,7 +65,7 @@ const ProductList: React.FC = () => {
   };
 
   const handleViewDetails = (id: string) => {
-    console.log("View details for product with ID:", id);
+    router.push(`/products/${id}`);
   };
 
   if (productState.loading) {
@@ -311,6 +311,4 @@ const ProductList: React.FC = () => {
       </ScrollView>
     </View>
   );
-};
-
-export default ProductList;
+}

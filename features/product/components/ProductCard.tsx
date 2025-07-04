@@ -32,7 +32,11 @@ const styles = StyleSheet.create({
     height: 58,
   },
 });
-export function ProductCard({ product, onDelete }: ProductCardProps) {
+export function ProductCard({
+  product,
+  onDelete,
+  onViewDetails,
+}: ProductCardProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -70,7 +74,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
                 }}
               >
                 <TouchableOpacity
-                  onPress={() => console.log("Edit product", product.id)}
+                  onPress={() => router.push(`/products/edit/${product.id}`)}
                   className="p-1 rounded"
                 >
                   <FontAwesome
@@ -109,7 +113,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
                   {product.category}
                 </Text>
                 <Text className="text-sm text-gray-500 dark:text-gray-400">
-                  {product.vendeur}
+                  {product.vendeur.name}
                 </Text>
               </View>
             </View>
@@ -117,7 +121,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
         </View>
 
         <TouchableOpacity
-          onPress={() => console.log("Voir détails", product.id)}
+          onPress={() => onViewDetails?.(product.id)}
           className="w-full mt-3 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
         >
           <Text className="text-center text-base text-gray-300 font-medium">

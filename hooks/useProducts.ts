@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import productsData from "@/data/products.json";
 import { Product } from "@/types/product.type";
+import { set } from "react-hook-form";
 
 type ProductFilters = {
   search?: string;
@@ -77,7 +78,7 @@ export const useProducts = () => {
 
     if (filters.vendeur) {
       filtered = filtered.filter(
-        (product) => product.vendeur === filters.vendeur
+        (product) => product.vendeur.name === filters.vendeur
       );
     }
 
@@ -198,7 +199,8 @@ export const useProducts = () => {
     }
   };
 
-  const getProductById = (id: string): Product | undefined => {
+  const getProductById = (id: string) => {
+    console.log("Fetching product by ID:", products);
     return products.find((product) => product.id === id);
   };
 
@@ -210,7 +212,9 @@ export const useProducts = () => {
   };
 
   const getVendeurs = (): string[] => {
-    const vendeurs = [...new Set(products.map((product) => product.vendeur))];
+    const vendeurs = [
+      ...new Set(products.map((product) => product.vendeur.name)),
+    ];
     return vendeurs.sort();
   };
 
