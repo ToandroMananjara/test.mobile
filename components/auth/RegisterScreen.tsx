@@ -182,7 +182,7 @@ export default function RegisterScreen() {
         <View className="flex-row justify-center mt-4">
           <Text className="flex text-lg text-gray-600">Déjà un compte ? </Text>
           <Text
-            className="flex text-lg text-blue-6070 font-semibold"
+            className="flex text-lg text-blue-600 font-semibold"
             onPress={() => router.replace("/auth/login")}
           >
             Se connecter

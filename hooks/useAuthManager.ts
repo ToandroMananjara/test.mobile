@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "./useSession";
 import { mockUsers } from "../data/users";
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 
 type AuthState = {
   loading: boolean;
@@ -110,7 +110,7 @@ export function useAuthManager() {
       console.log("User signed out");
     } catch (error) {
       console.error("Error during signout:", error);
-      throw error; // Relancer l'erreur pour que le caller puisse la gérer
+      throw error;
     }
   };
 

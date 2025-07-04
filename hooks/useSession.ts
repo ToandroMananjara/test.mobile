@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { User } from "@/types/user";
+import { User } from "@/types/user.type";
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated";
 
@@ -21,7 +21,6 @@ export function useSession(): UseSessionReturn {
   const [data, setData] = useState<Session | null>(null);
   const [status, setStatus] = useState<SessionStatus>("loading");
 
-  // Charger la session depuis AsyncStorage
   const loadSession = useCallback(async () => {
     try {
       setStatus("loading");
@@ -44,7 +43,6 @@ export function useSession(): UseSessionReturn {
     }
   }, []);
 
-  // Mettre à jour la session
   const update = useCallback(
     async (newData?: any): Promise<Session | null> => {
       try {
@@ -55,7 +53,6 @@ export function useSession(): UseSessionReturn {
           setStatus("authenticated");
           return session;
         } else {
-          // Recharger depuis le storage
           await loadSession();
           return data;
         }
@@ -67,7 +64,6 @@ export function useSession(): UseSessionReturn {
     [data, loadSession]
   );
 
-  // Effacer la session
   const clear = useCallback(async (): Promise<void> => {
     try {
       await AsyncStorage.removeItem(STORAGE_KEY);
@@ -79,7 +75,6 @@ export function useSession(): UseSessionReturn {
     }
   }, []);
 
-  // Charger la session au montage
   useEffect(() => {
     loadSession();
   }, [loadSession]);

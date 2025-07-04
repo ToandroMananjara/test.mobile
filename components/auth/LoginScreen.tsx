@@ -86,7 +86,7 @@ export default function LoginScreen() {
         />
 
         <TouchableOpacity
-          className={`bg-blue-600 py-4 rounded-lg items-center mt-2 ${
+          className={`bg-blue-600 py-4 rounded-lg items-center my-3 ${
             isSubmitting ? "opacity-50" : ""
           }`}
           onPress={handleSubmit(onSubmit)}

@@ -77,7 +77,7 @@ export function FormStepperWrapper({
   return (
     <ScrollView className="px-6 pt-10" keyboardShouldPersistTaps="handled">
       <Text className="text-3xl font-bold text-center mb-4">{title}</Text>
-      <View className="flex-row justify-center items-center mb-6 space-x-2">
+      <View className="flex-row justify-center items-center mb-6 gap-x-2">
         {steps.map((_, idx) => (
           <View
             key={idx}
