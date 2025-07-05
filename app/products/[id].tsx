@@ -170,7 +170,6 @@ export default function ProductDetailScreen() {
           </View>
         </View>
 
-        {/* Content */}
         <View className="bg-background dark:bg-background-dark -mt-5 rounded-t-3xl px-5 pt-6 shadow-lg">
           <View className="flex-row justify-between items-center mb-6">
             <View className="mb-6">
@@ -194,7 +193,6 @@ export default function ProductDetailScreen() {
               </View>
             </View>
           </View>
-          {/* Description */}
           {product.description && (
             <View className="mb-8">
               <Text className="text-lg font-semibold text-foreground dark:text-foreground-dark mb-3">
@@ -205,7 +203,6 @@ export default function ProductDetailScreen() {
               </Text>
             </View>
           )}
-          {/* Vendor Info */}
           <View className="rounded-xl border border-border dark:border-border-dark bg-card dark:bg-card-dark p-5 mb-8 shadow-sm">
             <Text className="text-lg font-bold text-foreground dark:text-foreground-dark mb-4">
               Vendu par

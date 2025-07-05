@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, TextInput, TextInputProps } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TextInputProps,
+  useColorScheme,
+} from "react-native";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
 interface ControlledTextareaProps<T extends FieldValues>
@@ -26,12 +32,20 @@ export default function ControlledTextarea<T extends FieldValues>({
   containerStyle,
   inputStyle,
   numberOfLines = 4,
+
   ...textInputProps
 }: ControlledTextareaProps<T>) {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
   return (
-    <View className="mb-2">
+    <View className="mb-4">
       {label && (
-        <Text className="text-sm font-semibold text-gray-800 mb-1.5">
+        <Text
+          className={`text-sm font-medium mb-2 ${
+            isDark ? "text-gray-300" : "text-gray-700"
+          }`}
+        >
           {label}
         </Text>
       )}
@@ -42,11 +56,11 @@ export default function ControlledTextarea<T extends FieldValues>({
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             placeholder={placeholder}
-            placeholderTextColor="#9CA3AF"
-            className={`bg-white p-3.5 rounded-lg border text-base text-gray-800 min-h-24 ${
-              error ? "border-red-500" : "border-gray-300"
+            placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+            className={`p-3 rounded-lg border text-base min-h-20${
+              error ? "border-red-500" : ""
             }`}
-            multiline={true}
+            multiline
             numberOfLines={numberOfLines}
             textAlignVertical="top"
             onBlur={onBlur}

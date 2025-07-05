@@ -6,7 +6,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Light mode
         background: "#ffffff",
         foreground: "#111827",
         card: "#f9fafb",
@@ -18,19 +17,6 @@ module.exports = {
         accent: "#e0f2fe",
         muted: "#f8fafc",
         destructive: "#ef4444",
-
-        // Dark mode
-        "background-dark": "#0f172a",
-        "foreground-dark": "#f8fafc",
-        "card-dark": "#1e293b",
-        "border-dark": "#334155",
-        "input-dark": "#1e293b",
-        "ring-dark": "#60a5fa",
-        "primary-dark": "#60a5fa",
-        "secondary-dark": "#1e293b",
-        "accent-dark": "#0ea5e9",
-        "muted-dark": "#1e293b",
-        "destructive-dark": "#b91c1c",
 
         // Branding colors
         "app-blue": "#2563eb",
