@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useColorScheme } from "@/components/useColorScheme";
 import { ControlledInput, ControlledPassword } from "@/components/forms";
 import { FormStepperWrapper } from "@/components/forms/FormStepperWrapper";
 import { AccountSchema, AccountSchemaValues } from "@/schemas/account.schema";
@@ -28,6 +29,8 @@ function StepCredentials() {
 
   const password = watch("password") || "";
   const [showRules, setShowRules] = useState(false);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const shouldShowRules = showRules || isSubmitted;
 
@@ -37,41 +40,47 @@ function StepCredentials() {
         label="Email"
         name="email"
         control={control}
-        placeholder="Email"
+        placeholder="Entrez votre email"
         autoCapitalize="none"
         keyboardType="email-address"
         error={errors.email?.message}
+        inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
       />
 
       <ControlledPassword
         label="Mot de passe"
         name="password"
         control={control}
-        placeholder="Mot de passe"
+        placeholder="Entrez votre mot de passe"
         error={errors.password?.message}
         onFocus={() => setShowRules(true)}
+        inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
       />
 
       {!shouldShowRules && (
-        <Text className="text-sm text-gray-500 mb-2">
+        <Text className="text-sm text-text-muted dark:text-text-muted-dark mb-3">
           Le mot de passe doit contenir au moins 8 caractères, une majuscule, un
           chiffre et un caractère spécial.
         </Text>
       )}
 
       {shouldShowRules && (
-        <View className="mb-2">
+        <View className="mb-4 p-3 bg-muted/50 dark:bg-muted-dark/50 rounded-lg border border-border dark:border-border-dark">
+          <Text className="text-sm font-medium text-foreground dark:text-foreground-dark mb-2">
+            Critères du mot de passe :
+          </Text>
           {passwordRules.map((rule, idx) => {
             const valid = rule.test(password);
 
-            const color = valid
-              ? "text-green-600"
-              : isSubmitted
-              ? "text-red-500"
-              : "text-gray-500";
+            const getColorClass = () => {
+              if (valid) return "text-green-600 dark:text-green-400";
+              if (isSubmitted)
+                return "text-destructive dark:text-destructive-dark";
+              return "text-text-muted dark:text-text-muted-dark";
+            };
 
             return (
-              <Text key={idx} className={`text-sm ${color} mb-0.5`}>
+              <Text key={idx} className={`text-sm ${getColorClass()} mb-1`}>
                 {valid ? "✔" : "✘"} {rule.label}
               </Text>
             );
@@ -83,8 +92,9 @@ function StepCredentials() {
         label="Confirmer le mot de passe"
         name="confirmPassword"
         control={control}
-        placeholder="Confirmer le mot de passe"
+        placeholder="Confirmez votre mot de passe"
         error={errors.confirmPassword?.message}
+        inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
       />
     </>
   );
@@ -102,30 +112,34 @@ function StepProfile() {
         label="Nom"
         name="lastName"
         control={control}
-        placeholder="Nom"
+        placeholder="Entrez votre nom"
         error={errors.lastName?.message}
+        inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
       />
       <ControlledInput
         label="Prénom"
         name="firstName"
         control={control}
-        placeholder="Prénom"
+        placeholder="Entrez votre prénom"
         error={errors.firstName?.message}
+        inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
       />
       <ControlledInput
         label="Adresse"
         name="address"
         control={control}
-        placeholder="Adresse (optionnel)"
+        placeholder="Entrez votre adresse (optionnel)"
         error={errors.address?.message}
+        inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
       />
       <ControlledInput
         label="Téléphone"
         name="phone"
         control={control}
-        placeholder="Téléphone (optionnel)"
+        placeholder="Entrez votre téléphone (optionnel)"
         keyboardType="phone-pad"
         error={errors.phone?.message}
+        inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
       />
     </>
   );
@@ -135,17 +149,19 @@ export default function RegisterScreen() {
   const router = useRouter();
   const { signUp } = useAuth();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const methods = useForm<AccountSchemaValues>({
     resolver: zodResolver(AccountSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
-      address: "",
+      firstName: "Marie",
+      lastName: "Martin",
+      email: "marie.martin@email.com",
+      password: "Password123!",
+      confirmPassword: "Password123!",
+      phone: "+33 6 98 76 54 32",
+      address: "456 Avenue des Champs, 69000 Lyon, France",
     },
   });
 
@@ -174,24 +190,27 @@ export default function RegisterScreen() {
     <FormProvider {...methods}>
       <View
         style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-        className="flex justify-center"
+        className="flex-1 bg-background dark:bg-background-dark"
       >
-        <FormStepperWrapper
-          title="Créer un compte"
-          steps={steps}
-          onSubmit={methods.handleSubmit(onSubmit)}
-          loading={methods.formState.isSubmitting}
-          error={methods.formState.errors.root?.message || null}
-          showSuccess={false}
-        />
-        <View className="flex-row justify-center mt-4">
-          <Text className="flex text-lg text-gray-600">Déjà un compte ? </Text>
-          <Text
-            className="flex text-lg text-blue-600 font-semibold"
-            onPress={() => router.replace("/auth/login")}
-          >
-            Se connecter
-          </Text>
+        <View>
+          <FormStepperWrapper
+            title="Créer un compte"
+            steps={steps}
+            onSubmit={methods.handleSubmit(onSubmit)}
+            loading={methods.formState.isSubmitting}
+            error={methods.formState.errors.root?.message || null}
+            showSuccess={false}
+          />
+          <View className="flex-row justify-center mt-6 px-6">
+            <Text className="text-base text-text-secondary dark:text-text-secondary-dark mr-2">
+              Déjà un compte ?
+            </Text>
+            <TouchableOpacity onPress={() => router.replace("/auth/login")}>
+              <Text className="text-base text-primary dark:text-primary-dark font-semibold ">
+                Se connecter
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </FormProvider>

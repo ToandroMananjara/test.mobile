@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useColorScheme } from "@/components/useColorScheme";
 import { ControlledInput, ControlledPassword } from "@/components/forms";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -21,6 +22,8 @@ export default function LoginScreen() {
   const { signIn, status, user } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -54,62 +57,69 @@ export default function LoginScreen() {
   return (
     <View
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      className="flex-1 justify-center px-6 bg-gray-50"
+      className="flex-1 justify-center px-6 bg-background dark:bg-background-dark"
     >
-      <Text className="text-3xl font-bold text-center mb-2 text-gray-800">
-        Bienvenue 👋
-      </Text>
-      <Text className="text-base text-center text-gray-600 mb-8">
-        Connecte-toi pour continuer
-      </Text>
+      <View className="items-center mb-10">
+        <Text className="text-4xl font-bold text-center mb-3 text-foreground dark:text-foreground-dark">
+          Bienvenue
+        </Text>
+        <Text className="text-lg text-center text-text-secondary dark:text-text-secondary-dark">
+          Connecte-toi pour continuer
+        </Text>
+      </View>
 
       {errors.root?.message && (
-        <View className=" flex flex-row justify-center items-center bg-red-50 rounded-lg p-3 mb-4 border border-red-200">
-          <Text className="text-red-700 text-xl flex">
+        <View className="flex flex-row justify-center items-center bg-destructive/10 dark:bg-destructive-dark/10 rounded-lg p-4 mb-6 border border-destructive/20 dark:border-destructive-dark/20">
+          <Text className="text-destructive dark:text-destructive-dark text-center font-medium text-sm">
             {errors.root.message}
           </Text>
         </View>
       )}
 
-      <View className="space-y-3">
+      <View className="space-y-5">
         <ControlledInput
           label="Email"
           control={control}
           name="email"
-          placeholder="Email"
+          placeholder="Entrez votre email"
           error={errors.email?.message}
           autoCapitalize="none"
           keyboardType="email-address"
+          inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
         />
 
         <ControlledPassword
           label="Mot de passe"
           control={control}
           name="password"
-          placeholder="Mot de passe"
+          placeholder="Entrez votre mot de passe"
           error={errors.password?.message}
+          inputStyle="bg-input dark:bg-input-dark border-border dark:border-border-dark text-foreground dark:text-foreground-dark focus:border-primary dark:focus:border-primary-dark"
         />
 
         <TouchableOpacity
-          className={`bg-blue-600 py-4 rounded-lg items-center my-3 ${
+          className={`bg-primary dark:bg-primary-dark py-4 rounded-lg items-center mt-8 shadow-lg ${
             isSubmitting ? "opacity-50" : ""
           }`}
           onPress={handleSubmit(onSubmit)}
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color="white" />
           ) : (
-            <Text className="text-white font-semibold text-base">
+            <Text className="text-white font-semibold text-lg">
               Se connecter
             </Text>
           )}
         </TouchableOpacity>
-        <View className="w-full  flex flex-row gap-3 items-center justify-end">
-          <Text className="flex text-lg font-medium">Pas de compte ?</Text>
+
+        <View className="flex flex-row  items-center justify-center mt-8">
+          <Text className="text-base font-medium text-text-secondary dark:text-text-secondary-dark mr-2">
+            Pas de compte ?
+          </Text>
           <TouchableOpacity onPress={() => router.push("/auth/register")}>
-            <Text className="flex text-center text-lg text-blue-600 font-medium">
-              s'inscrire
+            <Text className="text-base text-primary dark:text-primary-dark font-semibold ">
+              S'inscrire
             </Text>
           </TouchableOpacity>
         </View>

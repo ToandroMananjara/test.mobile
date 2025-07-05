@@ -41,10 +41,27 @@ export function useAuthManager() {
         return { success: false, message: "Cet email est déjà utilisé" };
       }
 
-      console.log("User signed up with data:", data);
+      const newUser = {
+        id: Date.now().toString(),
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        phone: data.phone || "",
+        address: data.address || "",
+        profileImage: "",
+        isActive: true,
+        createdAt: new Date().toISOString(),
+      };
 
-      setAuthState({ loading: false, success: true });
-      return { success: true, data: data };
+      mockUsers.push(newUser);
+
+      await update(newUser);
+
+      console.log("User signed up with data:", newUser);
+
+      setAuthState({ loading: false, success: true, error: null });
+      return { success: true, data: newUser };
     } catch (error) {
       const errorMessage =
         error instanceof Error
