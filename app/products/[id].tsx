@@ -11,6 +11,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useProducts } from "@/hooks/useProducts";
+import { useProductsContext } from "@/contexts/ProductsContext";
 import type { Product } from "@/types/product.type";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,7 +24,8 @@ export default function ProductDetailScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
-  const { getProductById, deleteProduct, productState } = useProducts();
+  const { deleteProduct, productState } = useProducts();
+  const { getProductById } = useProductsContext();
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {

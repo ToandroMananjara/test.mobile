@@ -4,7 +4,7 @@ export type Vendor = {
   email: string;
   phone: string;
   address: string;
-  profilePicture: string;
+  profilePicture?: string;
   isActive: boolean;
 };
 

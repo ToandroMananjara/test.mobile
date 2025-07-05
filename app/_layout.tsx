@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import "../global.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ProductsProvider } from "@/contexts/ProductsContext";
 import { useColorScheme } from "@/components/useColorScheme";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 export { ErrorBoundary } from "expo-router";
@@ -45,7 +46,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PaperProvider>
         <AuthProvider>
-          <RootLayoutNav />
+          <ProductsProvider>
+            <RootLayoutNav />
+          </ProductsProvider>
         </AuthProvider>
       </PaperProvider>
     </SafeAreaProvider>
