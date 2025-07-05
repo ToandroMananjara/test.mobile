@@ -11,12 +11,16 @@ export type AuthContextType = {
   }) => Promise<{ success: boolean; message?: string }>;
   signUp: (userData: any) => Promise<{ success: boolean; message?: string }>;
   signOut: () => Promise<void>;
+  updateUser: (
+    userData: Partial<User>
+  ) => Promise<{ success: boolean; message?: string }>;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { user, authState, signIn, signUp, signOut } = useAuthManager();
+  const { user, authState, signIn, signUp, signOut, updateUser } =
+    useAuthManager();
   const status: "loading" | "authenticated" | "unauthenticated" =
     authState.loading
       ? "loading"
@@ -25,7 +29,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       : "unauthenticated";
 
   return (
-    <AuthContext.Provider value={{ user, status, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        status,
+        signIn,
+        signUp,
+        signOut,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

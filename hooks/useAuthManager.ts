@@ -89,6 +89,7 @@ export function useAuthManager() {
         });
         return { success: false, message: "Mot de passe incorrect" };
       }
+
       await update(userByEmail);
 
       setAuthState({ loading: false, success: true, error: null });
@@ -114,11 +115,37 @@ export function useAuthManager() {
     }
   };
 
+  const updateUser = async (updatedData: Partial<User>) => {
+    try {
+      const currentUser = data?.user;
+
+      if (!currentUser) {
+        return { success: false, message: "Aucun utilisateur connecté" };
+      }
+
+      const updatedUser = { ...currentUser, ...updatedData };
+
+      await update(updatedUser);
+
+      return { success: true, message: "Profil mis à jour avec succès" };
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du user:", error);
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Erreur lors de la mise à jour",
+      };
+    }
+  };
+
   return {
     user: data?.user || null,
     authState,
     signIn,
     signUp,
     signOut,
+    updateUser,
   };
 }

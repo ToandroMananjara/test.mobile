@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ControlledInput, ControlledPassword } from "@/components/forms";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -19,6 +20,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginScreen() {
   const { signIn, status, user } = useAuth();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -50,7 +52,10 @@ export default function LoginScreen() {
   };
 
   return (
-    <View className="flex-1 justify-center px-6 bg-gray-50">
+    <View
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      className="flex-1 justify-center px-6 bg-gray-50"
+    >
       <Text className="text-3xl font-bold text-center mb-2 text-gray-800">
         Bienvenue 👋
       </Text>

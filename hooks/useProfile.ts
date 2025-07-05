@@ -10,7 +10,7 @@ type ProfileState = {
 };
 
 export const useProfile = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState<User | null>(null);
   const [profileState, setProfileState] = useState<ProfileState>({
     loading: false,
@@ -40,7 +40,12 @@ export const useProfile = () => {
       }
 
       const updatedProfile = { ...profile, ...updatedData };
+
       setProfile(updatedProfile);
+
+      if (updateUser) {
+        await updateUser(updatedProfile);
+      }
 
       setProfileState({ loading: false, success: true, error: null });
       Alert.alert("Succès", "Profil mis à jour avec succès");

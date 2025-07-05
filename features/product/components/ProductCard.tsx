@@ -46,7 +46,8 @@ export function ProductCard({
             <Image
               style={styles.tinyLogo}
               source={{
-                uri: "https://reactnative.dev/img/tiny_logo.png",
+                uri:
+                  product.image || "https://reactnative.dev/img/tiny_logo.png",
               }}
             />
           </View>
@@ -105,12 +106,11 @@ export function ProductCard({
             </View>
           </View>
         </View>
-
         <TouchableOpacity
           onPress={() => onViewDetails?.(product.id)}
-          className="w-full mt-3 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+          className="w-full"
         >
-          <Text className="text-center text-base text-gray-700 dark:text-gray-300 font-medium">
+          <Text className="text-center text-base bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3 text-blue-600 dark:text-blue-400 font-medium">
             Voir détails
           </Text>
         </TouchableOpacity>

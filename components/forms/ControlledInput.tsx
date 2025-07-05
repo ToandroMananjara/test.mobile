@@ -15,8 +15,8 @@ interface ControlledInputProps<T extends FieldValues>
   label?: string;
   placeholder?: string;
   error?: string;
-  containerStyle?: any;
-  inputStyle?: any;
+  containerStyle?: string;
+  inputStyle?: string;
 }
 
 export default function ControlledInput<T extends FieldValues>({
@@ -27,20 +27,15 @@ export default function ControlledInput<T extends FieldValues>({
   error,
   containerStyle,
   inputStyle,
-
   ...textInputProps
 }: ControlledInputProps<T>) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
   return (
-    <View className="mb-4">
+    <View className={`mb-4 ${containerStyle || ""}`}>
       {label && (
-        <Text
-          className={`text-sm font-medium mb-2 ${
-            isDark ? "text-gray-300" : "text-gray-700"
-          }`}
-        >
+        <Text className="text-sm font-medium mb-2 text-foreground dark:text-foreground-dark">
           {label}
         </Text>
       )}
@@ -51,9 +46,14 @@ export default function ControlledInput<T extends FieldValues>({
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             placeholder={placeholder}
-            placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
+            placeholderTextColor={isDark ? "#94a3b8" : "#64748b"}
             className={`p-3 rounded-lg border text-base ${
-              error ? "border-red-500" : ""
+              error
+                ? "border-destructive dark:border-destructive-dark"
+                : "border-border dark:border-border-dark"
+            } ${
+              inputStyle ||
+              "bg-input dark:bg-input-dark text-foreground dark:text-foreground-dark"
             }`}
             onBlur={onBlur}
             onChangeText={onChange}
@@ -63,7 +63,11 @@ export default function ControlledInput<T extends FieldValues>({
         )}
       />
 
-      {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
+      {error && (
+        <Text className="text-destructive dark:text-destructive-dark text-xs mt-1">
+          {error}
+        </Text>
+      )}
     </View>
   );
 }

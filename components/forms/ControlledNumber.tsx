@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, TextInput, TextInputProps } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TextInputProps,
+  useColorScheme,
+} from "react-native";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 
 interface ControlledNumberProps<T extends FieldValues>
@@ -12,8 +18,8 @@ interface ControlledNumberProps<T extends FieldValues>
   label?: string;
   placeholder?: string;
   error?: string;
-  containerStyle?: any;
-  inputStyle?: any;
+  containerStyle?: string;
+  inputStyle?: string;
   allowDecimals?: boolean;
 }
 
@@ -28,6 +34,9 @@ export default function ControlledNumber<T extends FieldValues>({
   allowDecimals = false,
   ...textInputProps
 }: ControlledNumberProps<T>) {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
   const handleNumberChange = (
     text: string,
     onChange: (value: string) => void
@@ -40,9 +49,9 @@ export default function ControlledNumber<T extends FieldValues>({
   };
 
   return (
-    <View className="mb-2">
+    <View className={`mb-4 ${containerStyle || ""}`}>
       {label && (
-        <Text className="text-sm font-semibold text-gray-800 mb-1.5">
+        <Text className="text-sm font-medium mb-2 text-foreground dark:text-foreground-dark">
           {label}
         </Text>
       )}
@@ -53,9 +62,14 @@ export default function ControlledNumber<T extends FieldValues>({
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             placeholder={placeholder}
-            placeholderTextColor="#9CA3AF"
-            className={`bg-white p-3.5 rounded-lg border text-base text-gray-800 ${
-              error ? "border-red-500" : "border-gray-300"
+            placeholderTextColor={isDark ? "#94a3b8" : "#64748b"}
+            className={`p-3 rounded-lg border text-base ${
+              error
+                ? "border-destructive dark:border-destructive-dark"
+                : "border-border dark:border-border-dark"
+            } ${
+              inputStyle ||
+              "bg-input dark:bg-input-dark text-foreground dark:text-foreground-dark"
             }`}
             keyboardType={allowDecimals ? "decimal-pad" : "numeric"}
             onBlur={onBlur}
@@ -66,7 +80,11 @@ export default function ControlledNumber<T extends FieldValues>({
         )}
       />
 
-      {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
+      {error && (
+        <Text className="text-destructive dark:text-destructive-dark text-xs mt-1">
+          {error}
+        </Text>
+      )}
     </View>
   );
 }

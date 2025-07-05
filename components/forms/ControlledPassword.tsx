@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   TextInputProps,
+  useColorScheme,
 } from "react-native";
 import { Control, Controller, FieldPath, FieldValues } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react-native";
@@ -19,8 +20,8 @@ interface ControlledPasswordProps<T extends FieldValues>
   label?: string;
   placeholder?: string;
   error?: string;
-  containerStyle?: any;
-  inputStyle?: any;
+  containerStyle?: string;
+  inputStyle?: string;
   showToggleButton?: boolean;
 }
 
@@ -36,11 +37,13 @@ export default function ControlledPassword<T extends FieldValues>({
   ...textInputProps
 }: ControlledPasswordProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   return (
-    <View className="mb-2">
+    <View className={`mb-4 ${containerStyle || ""}`}>
       {label && (
-        <Text className="text-lg font-semibold text-gray-800 mb-1.5">
+        <Text className="text-sm font-medium mb-2 text-foreground dark:text-foreground-dark">
           {label}
         </Text>
       )}
@@ -52,13 +55,17 @@ export default function ControlledPassword<T extends FieldValues>({
           <View className="relative justify-center">
             <TextInput
               placeholder={placeholder}
-              placeholderTextColor="#9CA3AF"
-              className={`bg-white p-3.5 pr-12 rounded-lg border text-base text-gray-800 ${
-                error ? "border-red-500" : "border-gray-300"
+              placeholderTextColor={isDark ? "#94a3b8" : "#64748b"}
+              className={`p-3 pr-12 rounded-lg border text-base ${
+                error
+                  ? "border-destructive dark:border-destructive-dark"
+                  : "border-border dark:border-border-dark"
+              } ${
+                inputStyle ||
+                "bg-input dark:bg-input-dark text-foreground dark:text-foreground-dark"
               }`}
               secureTextEntry={!showPassword}
               onBlur={onBlur}
-              onFocus={onBlur}
               onChangeText={onChange}
               value={value}
               {...textInputProps}
@@ -70,9 +77,9 @@ export default function ControlledPassword<T extends FieldValues>({
                 activeOpacity={0.7}
               >
                 {showPassword ? (
-                  <EyeOff size={20} color="#6B7280" />
+                  <EyeOff size={20} color={isDark ? "#94a3b8" : "#64748b"} />
                 ) : (
-                  <Eye size={20} color="#6B7280" />
+                  <Eye size={20} color={isDark ? "#94a3b8" : "#64748b"} />
                 )}
               </TouchableOpacity>
             )}
@@ -80,7 +87,11 @@ export default function ControlledPassword<T extends FieldValues>({
         )}
       />
 
-      {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
+      {error && (
+        <Text className="text-destructive dark:text-destructive-dark text-xs mt-1">
+          {error}
+        </Text>
+      )}
     </View>
   );
 }

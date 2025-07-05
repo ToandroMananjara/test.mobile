@@ -161,7 +161,7 @@ export default function ProductList() {
   );
 
   const ListFooterComponent = () => (
-    <View className="p-4">
+    <View className="p-3">
       {paginatedData.totalPages > 1 && (
         <View className="mb-4">
           <Pagination
@@ -173,7 +173,7 @@ export default function ProductList() {
       )}
 
       {filteredProducts.length > 0 && (
-        <View className="mb-6 p-4 bg-muted dark:bg-muted-dark rounded-lg">
+        <View className="mb-6 p-3 bg-muted dark:bg-muted-dark rounded-lg">
           <Text className="text-gray-500 py-4 dark:text-gray-400 text-center text-sm">
             Affichage {paginatedData.indexOfFirstProduct + 1} à{" "}
             {Math.min(

@@ -3,6 +3,7 @@ import { View, Text } from "react-native";
 import { useForm, FormProvider, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ControlledInput, ControlledPassword } from "@/components/forms";
 import { FormStepperWrapper } from "@/components/forms/FormStepperWrapper";
 import { AccountSchema, AccountSchemaValues } from "@/schemas/account.schema";
@@ -133,6 +134,7 @@ function StepProfile() {
 export default function RegisterScreen() {
   const router = useRouter();
   const { signUp } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const methods = useForm<AccountSchemaValues>({
     resolver: zodResolver(AccountSchema),
@@ -170,7 +172,10 @@ export default function RegisterScreen() {
 
   return (
     <FormProvider {...methods}>
-      <View className="flex justify-center">
+      <View
+        style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+        className="flex justify-center"
+      >
         <FormStepperWrapper
           title="Créer un compte"
           steps={steps}

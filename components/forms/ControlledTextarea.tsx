@@ -18,8 +18,8 @@ interface ControlledTextareaProps<T extends FieldValues>
   label?: string;
   placeholder?: string;
   error?: string;
-  containerStyle?: any;
-  inputStyle?: any;
+  containerStyle?: string;
+  inputStyle?: string;
   numberOfLines?: number;
 }
 
@@ -32,20 +32,15 @@ export default function ControlledTextarea<T extends FieldValues>({
   containerStyle,
   inputStyle,
   numberOfLines = 4,
-
   ...textInputProps
 }: ControlledTextareaProps<T>) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
   return (
-    <View className="mb-4">
+    <View className={`mb-4 ${containerStyle || ""}`}>
       {label && (
-        <Text
-          className={`text-sm font-medium mb-2 ${
-            isDark ? "text-gray-300" : "text-gray-700"
-          }`}
-        >
+        <Text className="text-sm font-medium mb-2 text-foreground dark:text-foreground-dark">
           {label}
         </Text>
       )}
@@ -56,9 +51,14 @@ export default function ControlledTextarea<T extends FieldValues>({
         render={({ field: { onChange, onBlur, value } }) => (
           <TextInput
             placeholder={placeholder}
-            placeholderTextColor={isDark ? "#6B7280" : "#9CA3AF"}
-            className={`p-3 rounded-lg border text-base min-h-20${
-              error ? "border-red-500" : ""
+            placeholderTextColor={isDark ? "#94a3b8" : "#64748b"}
+            className={`p-3 rounded-lg border text-base min-h-20 ${
+              error
+                ? "border-destructive dark:border-destructive-dark"
+                : "border-border dark:border-border-dark"
+            } ${
+              inputStyle ||
+              "bg-input dark:bg-input-dark text-foreground dark:text-foreground-dark"
             }`}
             multiline
             numberOfLines={numberOfLines}
@@ -71,7 +71,11 @@ export default function ControlledTextarea<T extends FieldValues>({
         )}
       />
 
-      {error && <Text className="text-red-500 text-xs mt-1">{error}</Text>}
+      {error && (
+        <Text className="text-destructive dark:text-destructive-dark text-xs mt-1">
+          {error}
+        </Text>
+      )}
     </View>
   );
 }

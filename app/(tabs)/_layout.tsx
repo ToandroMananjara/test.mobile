@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, View, Text, Platform } from "react-native";
+import { Alert, View, Text, Platform, useColorScheme } from "react-native";
 import { Tabs, router } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
@@ -10,39 +10,60 @@ const tabBarIcon = (
   name: React.ComponentProps<typeof FontAwesome>["name"],
   label: string
 ) => {
-  return ({ focused }: { focused: boolean }) => (
-    <View
-      style={{
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 4,
-        minWidth: 60,
-      }}
-    >
-      <FontAwesome
-        name={name}
-        size={Platform.OS === "web" ? 20 : 22}
-        color={focused ? "#2563eb" : "#6b7280"}
-      />
-      <Text
+  return ({ focused }: { focused: boolean }) => {
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === "dark";
+
+    return (
+      <View
         style={{
-          fontSize: Platform.OS === "web" ? 11 : 12,
-          marginTop: 3,
-          color: focused ? "#2563eb" : "#6b7280",
-          fontWeight: focused ? "600" : "400",
-          textAlign: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 4,
+          minWidth: 60,
         }}
-        numberOfLines={1}
       >
-        {label}
-      </Text>
-    </View>
-  );
+        <FontAwesome
+          name={name}
+          size={Platform.OS === "web" ? 20 : 22}
+          color={
+            focused
+              ? isDark
+                ? "#60A5FA"
+                : "#3B82F6"
+              : isDark
+              ? "#9CA3AF"
+              : "#6B7280"
+          }
+        />
+        <Text
+          style={{
+            fontSize: Platform.OS === "web" ? 11 : 12,
+            marginTop: 3,
+            color: focused
+              ? isDark
+                ? "#60A5FA"
+                : "#3B82F6"
+              : isDark
+              ? "#9CA3AF"
+              : "#6B7280",
+            fontWeight: focused ? "600" : "400",
+            textAlign: "center",
+          }}
+          numberOfLines={1}
+        >
+          {label}
+        </Text>
+      </View>
+    );
+  };
 };
 
 export default function TabLayout() {
   const { signOut } = useAuth();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const handleLogout = () => {
     Alert.alert("Déconnexion", "Voulez-vous vous déconnecter ?", [
@@ -66,11 +87,11 @@ export default function TabLayout() {
     ]);
   };
 
-  // Configuration adaptative pour web et mobile
+  // Configuration adaptative pour web et mobile avec support du thème
   const tabBarStyleConfig = Platform.select({
     web: {
-      backgroundColor: "white",
-      borderTopColor: "#e5e7eb",
+      backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+      borderTopColor: isDark ? "#374151" : "#E5E7EB",
       borderTopWidth: 1,
       height: 65,
       paddingBottom: 8,
@@ -81,8 +102,8 @@ export default function TabLayout() {
       right: 0,
     },
     default: {
-      backgroundColor: "white",
-      borderTopColor: "#e5e7eb",
+      backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
+      borderTopColor: isDark ? "#374151" : "#E5E7EB",
       borderTopWidth: 1,
       height: 65 + insets.bottom,
       paddingBottom: Math.max(insets.bottom, 8),
@@ -90,7 +111,7 @@ export default function TabLayout() {
       elevation: 8,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: -2 },
-      shadowOpacity: 0.1,
+      shadowOpacity: isDark ? 0.3 : 0.1,
       shadowRadius: 8,
     },
   });
@@ -102,8 +123,8 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarStyle: tabBarStyleConfig,
         tabBarHideOnKeyboard: true,
-        tabBarActiveTintColor: "#2563eb",
-        tabBarInactiveTintColor: "#6b7280",
+        tabBarActiveTintColor: isDark ? "#60A5FA" : "#3B82F6",
+        tabBarInactiveTintColor: isDark ? "#9CA3AF" : "#6B7280",
       }}
     >
       <Tabs.Screen
