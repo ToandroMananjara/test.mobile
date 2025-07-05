@@ -7,6 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { Portal } from "react-native-paper";
 import { useColorScheme } from "@/components/useColorScheme";
 
 type Props = {
@@ -23,25 +24,37 @@ export const SelectDropdown = ({
   onSelect,
 }: Props) => {
   const [open, setOpen] = React.useState(false);
-  const [buttonLayout, setButtonLayout] = React.useState({ y: 0, height: 0 });
+  const [buttonLayout, setButtonLayout] = React.useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const screenHeight = Dimensions.get("window").height;
+  const buttonRef = React.useRef<View>(null);
 
-  const handleLayout = (event: any) => {
-    const { y, height } = event.nativeEvent.layout;
-    setButtonLayout({ y, height });
+  const handleOpen = () => {
+    if (buttonRef.current) {
+      buttonRef.current.measureInWindow(
+        (x: number, y: number, width: number, height: number) => {
+          setButtonLayout({ x, y, width, height });
+          setOpen(true);
+        }
+      );
+    }
   };
 
-  const dropdownTop = buttonLayout.y + buttonLayout.height + 5;
-  const dropdownMaxHeight = screenHeight - dropdownTop - 100;
+  const dropdownTop = buttonLayout.y + buttonLayout.height;
 
   return (
-    <View className="flex-1 relative">
+    <View>
       <TouchableOpacity
+        ref={buttonRef}
         className="flex-row items-center justify-between border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-3 rounded-lg"
-        onPress={() => setOpen(!open)}
-        onLayout={handleLayout}
+        onPress={handleOpen}
+        activeOpacity={0.8}
       >
         <Text
           className="text-gray-900 dark:text-gray-100 flex-1"
@@ -58,56 +71,75 @@ export const SelectDropdown = ({
       </TouchableOpacity>
 
       {open && (
-        <>
+        <Portal>
           <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setOpen(false)}
             style={{
               position: "absolute",
-              top: -1000,
-              left: -1000,
-              right: -1000,
-              bottom: -1000,
-              zIndex: 5,
-              elevation: 5,
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 998,
             }}
-            onPress={() => setOpen(false)}
           />
 
           <View
             style={{
               position: "absolute",
-              top: dropdownTop,
-              left: 0,
-              right: 0,
-              maxHeight: dropdownMaxHeight,
-              zIndex: 5,
-              elevation: 5,
+              top: dropdownTop + 28,
+              left: buttonLayout.x,
+              width: buttonLayout.width,
+              maxHeight: Math.min(250, screenHeight - dropdownTop - 20),
+              backgroundColor: isDark ? "#1f2937" : "#ffffff",
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: isDark ? "#374151" : "#e5e7eb",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.15,
+              shadowRadius: 5,
+              elevation: 10,
+              zIndex: 999,
             }}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg"
           >
             <FlatList
               data={options}
               keyExtractor={(item) => item}
+              nestedScrollEnabled
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => (
                 <TouchableOpacity
-                  className={`px-3 py-3 ${
-                    index !== options.length - 1
-                      ? "border-b border-gray-100 dark:border-gray-700"
-                      : ""
-                  } ${
-                    item === selected ? "bg-blue-50 dark:bg-blue-900/20" : ""
-                  }`}
                   onPress={() => {
                     onSelect(item);
                     setOpen(false);
                   }}
+                  style={{
+                    paddingVertical: 12,
+                    paddingHorizontal: 12,
+                    backgroundColor:
+                      item === selected
+                        ? isDark
+                          ? "#1e40af20"
+                          : "#dbeafe"
+                        : "transparent",
+                    borderBottomWidth: index !== options.length - 1 ? 1 : 0,
+                    borderBottomColor: isDark ? "#374151" : "#f3f4f6",
+                  }}
                 >
                   <Text
-                    className={`${
-                      item === selected
-                        ? "text-blue-600 dark:text-blue-400 font-medium"
-                        : "text-gray-900 dark:text-gray-100"
-                    }`}
+                    style={{
+                      color:
+                        item === selected
+                          ? isDark
+                            ? "#60a5fa"
+                            : "#2563eb"
+                          : isDark
+                          ? "#f9fafb"
+                          : "#111827",
+                      fontWeight: item === selected ? "600" : "400",
+                    }}
                   >
                     {item === "all" ? `Tous les ${label.toLowerCase()}s` : item}
                   </Text>
@@ -115,7 +147,7 @@ export const SelectDropdown = ({
               )}
             />
           </View>
-        </>
+        </Portal>
       )}
     </View>
   );

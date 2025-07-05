@@ -1,5 +1,14 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, TextInput, Alert } from "react-native";
+import React, { useState, useMemo } from "react";
+import {
+  FlatList,
+  TextInput,
+  Alert,
+  View,
+  Text,
+  useColorScheme,
+  ListRenderItem,
+  RefreshControl,
+} from "react-native";
 import { ProductCard } from "./ProductCard";
 import { Pagination } from "@/components/Pagination";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
@@ -7,7 +16,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProducts } from "@/hooks/useProducts";
 import { router } from "expo-router";
-import { useColorScheme } from "@/components/useColorScheme";
+import { Product } from "@/types/product.type";
 
 export default function ProductList() {
   const colorScheme = useColorScheme();
@@ -25,15 +34,30 @@ export default function ProductList() {
   } = useProducts();
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [refreshing, setRefreshing] = useState(false);
   const productsPerPage = 6;
 
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const paginatedData = useMemo(() => {
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    return {
+      currentProducts: filteredProducts.slice(
+        indexOfFirstProduct,
+        indexOfLastProduct
+      ),
+      totalPages: Math.ceil(filteredProducts.length / productsPerPage),
+      indexOfFirstProduct,
+      indexOfLastProduct,
+    };
+  }, [filteredProducts, currentPage, productsPerPage]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleDelete = async (id: string, name: string) => {
     Alert.alert(
@@ -48,7 +72,11 @@ export default function ProductList() {
             const result = await deleteProduct(id);
             if (result.success) {
               Alert.alert("Succès", `${name} a été supprimé avec succès`);
-              if (currentProducts.length === 1 && currentPage > 1) {
+              // Ajuster la page si nécessaire
+              if (
+                paginatedData.currentProducts.length === 1 &&
+                currentPage > 1
+              ) {
                 setCurrentPage(currentPage - 1);
               }
             } else {
@@ -61,140 +89,51 @@ export default function ProductList() {
   };
 
   const handleEdit = (id: string) => {
-    console.log("Edit product with ID:", id);
+    router.push(`/products/edit/${id}`);
   };
 
   const handleViewDetails = (id: string) => {
     router.push(`/products/${id}`);
   };
 
-  if (productState.loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: isDark ? "#18181b" : "#f9fafb",
-        }}
-      >
-        <View className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-        <Text
-          style={{
-            marginTop: 16,
-            color: isDark ? "#9ca3af" : "#6b7280",
-          }}
-        >
-          Chargement des produits...
-        </Text>
-      </View>
-    );
-  }
+  const renderProductItem: ListRenderItem<Product> = ({ item }) => (
+    <View className="mb-4 mx-4">
+      <ProductCard
+        product={item}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+        onViewDetails={handleViewDetails}
+      />
+    </View>
+  );
 
-  if (productState.error) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: isDark ? "#18181b" : "#f9fafb",
-          paddingHorizontal: 20,
-        }}
-      >
-        <FontAwesome name="exclamation-triangle" size={48} color="#dc2626" />
-        <Text
-          style={{
-            marginTop: 16,
-            color: isDark ? "#9ca3af" : "#6b7280",
-            textAlign: "center",
-            fontSize: 16,
-          }}
-        >
-          {productState.error}
-        </Text>
-        <Text
-          style={{
-            marginTop: 8,
-            color: isDark ? "#6b7280" : "#9ca3af",
-            textAlign: "center",
-            fontSize: 14,
-          }}
-        >
-          Veuillez réessayer plus tard
-        </Text>
-      </View>
-    );
-  }
-
-  return (
+  const ListHeaderComponent = () => (
     <View
-      style={{
-        flex: 1,
-        backgroundColor: isDark ? "#18181b" : "#f9fafb",
-      }}
+      className="bg-card dark:bg-card-dark border-b border-border dark:border-border-dark shadow-sm mb-4"
+      style={{ paddingTop: insets.top }}
     >
-      <View
-        style={{
-          paddingTop: insets.top,
-          backgroundColor: isDark ? "#18181b" : "#ffffff",
-          borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#374151" : "#e5e7eb",
-          zIndex: 10,
-          elevation: 3,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 3,
-        }}
-      >
-        <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
-          <View style={{ marginBottom: 16 }}>
-            <Text
-              style={{
-                fontSize: 20,
-                color: isDark ? "#9ca3af" : "#6b7280",
-              }}
-            >
-              {filteredProducts.length} produit
-              {filteredProducts.length > 1 ? "s" : ""} disponible
-              {filteredProducts.length > 1 ? "s" : ""}
-            </Text>
-          </View>
-
-          <View style={{ marginBottom: 16, position: "relative" }}>
-            <TextInput
-              placeholder="Rechercher un produit..."
-              placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
-              style={{
-                width: "100%",
-                paddingLeft: 40,
-                padding: 12,
-                backgroundColor: isDark ? "#1f2937" : "#ffffff",
-                borderColor: isDark ? "#374151" : "#d1d5db",
-                borderWidth: 1,
-                borderRadius: 8,
-                color: isDark ? "#f9fafb" : "#111827",
-              }}
-              value={filters.search || ""}
-              onChangeText={(value) => {
-                handleFilterChange("search", value);
-                setCurrentPage(1);
-              }}
-            />
-            <FontAwesome
-              name="search"
-              size={16}
-              color={isDark ? "#9CA3AF" : "#6B7280"}
-              style={{
-                position: "absolute",
-                left: 12,
-                top: 16,
-              }}
-            />
-          </View>
-
-          <View style={{ flexDirection: "row", gap: 12, marginBottom: 8 }}>
+      <View className="px-4 pb-4">
+        <View className="mb-4">
+          <Text className="text-xl text-foreground dark:text-foreground-dark">
+            {filteredProducts.length} produit
+            {filteredProducts.length > 1 ? "s" : ""} disponible
+            {filteredProducts.length > 1 ? "s" : ""}
+          </Text>
+        </View>
+        <View className="mb-4 ">
+          <TextInput
+            placeholder="Rechercher un produit..."
+            placeholderTextColor={isDark ? "#64748b" : "#9ca3af"}
+            className="w-full pl-10 p-3 bg-input dark:bg-input-dark border border-border dark:border-border-dark rounded-lg text-foreground dark:text-foreground-dark"
+            value={filters.search || ""}
+            onChangeText={(value) => {
+              handleFilterChange("search", value);
+              setCurrentPage(1);
+            }}
+          />
+        </View>
+        <View className="flex-row mb-2">
+          <View className="flex-1 mr-2">
             <SelectDropdown
               label="Catégorie"
               options={["all", ...getCategories()]}
@@ -204,6 +143,8 @@ export default function ProductList() {
                 setCurrentPage(1);
               }}
             />
+          </View>
+          <View className="flex-1 ml-2">
             <SelectDropdown
               label="Vendeur"
               options={["all", ...getVendeurs()]}
@@ -216,99 +157,115 @@ export default function ProductList() {
           </View>
         </View>
       </View>
+    </View>
+  );
 
-      <ScrollView
-        style={{ flex: 1 }}
+  const ListFooterComponent = () => (
+    <View className="p-4">
+      {paginatedData.totalPages > 1 && (
+        <View className="mb-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={paginatedData.totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </View>
+      )}
+
+      {filteredProducts.length > 0 && (
+        <View className="mb-6 p-4 bg-muted dark:bg-muted-dark rounded-lg">
+          <Text className="text-gray-500 py-4 dark:text-gray-400 text-center text-sm">
+            Affichage {paginatedData.indexOfFirstProduct + 1} à{" "}
+            {Math.min(
+              paginatedData.indexOfLastProduct,
+              filteredProducts.length
+            )}{" "}
+            sur {filteredProducts.length} produits
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+
+  const ListEmptyComponent = () => (
+    <View className="py-12 items-center px-4">
+      <FontAwesome
+        name="exclamation-circle"
+        size={48}
+        color={isDark ? "#64748b" : "#9ca3af"}
+      />
+      <Text className="mt-4 text-foreground dark:text-foreground-dark text-center text-base">
+        {filteredProducts.length === 0
+          ? "Aucun produit trouvé"
+          : "Aucun produit sur cette page"}
+      </Text>
+      {filters.search && (
+        <Text className="mt-2 text-gray-500 dark:text-gray-400 text-center text-sm">
+          Essayez de modifier vos critères de recherche
+        </Text>
+      )}
+    </View>
+  );
+
+  if (productState.loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-background dark:bg-background-dark">
+        <View className="w-12 h-12 border-4 border-primary dark:border-primary-dark border-t-transparent rounded-full animate-spin" />
+        <Text className="mt-4 text-foreground dark:text-foreground-dark text-base">
+          Chargement des produits...
+        </Text>
+      </View>
+    );
+  }
+
+  if (productState.error) {
+    return (
+      <View className="flex-1 justify-center items-center bg-background dark:bg-background-dark px-5">
+        <FontAwesome
+          name="exclamation-triangle"
+          size={48}
+          color={isDark ? "#b91c1c" : "#ef4444"}
+        />
+        <Text className="mt-4 text-destructive dark:text-destructive-dark text-center text-base">
+          {productState.error}
+        </Text>
+        <Text className="mt-2 text-gray-500 dark:text-gray-400 text-center text-sm">
+          Veuillez réessayer plus tard
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-background dark:bg-background-dark">
+      <FlatList
+        data={paginatedData.currentProducts}
+        renderItem={renderProductItem}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={ListHeaderComponent}
+        ListFooterComponent={ListFooterComponent}
+        ListEmptyComponent={ListEmptyComponent}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
+          flexGrow: 1,
+          paddingVertical: 16,
+          paddingHorizontal: 8,
         }}
-      >
-        <View style={{ marginBottom: 0 }}>
-          {currentProducts.length === 0 ? (
-            <View
-              style={{
-                paddingVertical: 48,
-                alignItems: "center",
-              }}
-            >
-              <FontAwesome
-                name="exclamation-circle"
-                size={48}
-                color={isDark ? "#6B7280" : "#9CA3AF"}
-              />
-              <Text
-                style={{
-                  marginTop: 16,
-                  color: isDark ? "#9ca3af" : "#6b7280",
-                  textAlign: "center",
-                  fontSize: 16,
-                }}
-              >
-                {filteredProducts.length === 0
-                  ? "Aucun produit trouvé"
-                  : "Aucun produit sur cette page"}
-              </Text>
-              {filters.search && (
-                <Text
-                  style={{
-                    marginTop: 8,
-                    color: isDark ? "#6b7280" : "#9ca3af",
-                    textAlign: "center",
-                    fontSize: 14,
-                  }}
-                >
-                  Essayez de modifier vos critères de recherche
-                </Text>
-              )}
-            </View>
-          ) : (
-            currentProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                onViewDetails={handleViewDetails}
-              />
-            ))
-          )}
-        </View>
-
-        {totalPages > 1 && (
-          <View style={{ marginBottom: 5 }}>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </View>
-        )}
-
-        {filteredProducts.length > 0 && (
-          <View
-            style={{
-              marginBottom: 24,
-              padding: 16,
-              backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
-              borderRadius: 8,
-            }}
-          >
-            <Text
-              style={{
-                color: isDark ? "#9ca3af" : "#6b7280",
-                textAlign: "center",
-                fontSize: 14,
-              }}
-            >
-              Affichage {indexOfFirstProduct + 1} à{" "}
-              {Math.min(indexOfLastProduct, filteredProducts.length)} sur{" "}
-              {filteredProducts.length} produits
-            </Text>
-          </View>
-        )}
-      </ScrollView>
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[isDark ? "#60a5fa" : "#2563eb"]}
+            tintColor={isDark ? "#60a5fa" : "#2563eb"}
+          />
+        }
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={50}
+        initialNumToRender={6}
+        windowSize={10}
+        ItemSeparatorComponent={null}
+      />
     </View>
   );
 }

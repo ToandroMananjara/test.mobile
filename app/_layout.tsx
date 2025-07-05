@@ -14,7 +14,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { useColorScheme } from "@/components/useColorScheme";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 export { ErrorBoundary } from "expo-router";
-
+import { Provider as PaperProvider } from "react-native-paper";
 export const unstable_settings = {
   initialRouteName: "auth",
 };
@@ -43,9 +43,11 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <RootLayoutNav />
-      </AuthProvider>
+      <PaperProvider>
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
+      </PaperProvider>
     </SafeAreaProvider>
   );
 }
@@ -59,6 +61,7 @@ function RootLayoutNav() {
         <Stack.Screen name="auth" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        <Stack.Screen name="products" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );
