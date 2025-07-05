@@ -34,8 +34,8 @@ export default function LoginScreen() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "test@example.com",
-      password: "password123",
+      email: "",
+      password: "",
     },
   });
 
@@ -122,6 +122,12 @@ export default function LoginScreen() {
               S'inscrire
             </Text>
           </TouchableOpacity>
+        </View>
+
+        <View className="flex flex-row items-center justify-center mt-4">
+          <Text className="text-base font-medium text-text-secondary dark:text-text-secondary-dark mr-2">
+            Donnée de Test: test@example.com / password123
+          </Text>
         </View>
       </View>
     </View>

@@ -155,13 +155,13 @@ export default function RegisterScreen() {
   const methods = useForm<AccountSchemaValues>({
     resolver: zodResolver(AccountSchema),
     defaultValues: {
-      firstName: "Marie",
-      lastName: "Martin",
-      email: "marie.martin@email.com",
-      password: "Password123!",
-      confirmPassword: "Password123!",
-      phone: "+33 6 98 76 54 32",
-      address: "456 Avenue des Champs, 69000 Lyon, France",
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      phone: "",
+      address: "",
     },
   });
 

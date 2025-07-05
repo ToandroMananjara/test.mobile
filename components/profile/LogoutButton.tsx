@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { router } from "expo-router";
 
 interface LogoutButtonProps {
   onLogout: () => Promise<void>;
@@ -18,6 +19,8 @@ export function LogoutButton({ onLogout }: LogoutButtonProps) {
         onPress: async () => {
           try {
             await onLogout();
+            router.replace("/auth/login");
+
             console.log("Déconnexion réussie");
           } catch (error) {
             console.error("Erreur lors de la déconnexion:", error);
