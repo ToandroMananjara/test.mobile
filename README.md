@@ -41,6 +41,69 @@ npx expo start
 
 **Important**: Cette application est optimisée pour mobile uniquement. N'utilisez pas la version web.
 
+## Build et Installation de l'APK
+
+### Configuration EAS Build
+
+1. Installer EAS CLI globalement:
+
+   ```bash
+   npm install -g eas-cli
+   ```
+
+2. Se connecter à votre compte Expo:
+
+   ```bash
+   eas login
+   ```
+
+3. Configurer le projet:
+   ```bash
+   eas build:configure
+   ```
+
+### Créer un build Android (APK)
+
+Pour créer un APK de développement:
+
+```bash
+eas build -p android --profile preview
+```
+
+Pour créer un APK de production:
+
+```bash
+eas build -p android --profile production
+```
+
+### Télécharger et installer l'APK
+
+1. Une fois le build terminé, EAS affichera un lien de téléchargement dans le terminal
+
+2. Vous pouvez également retrouver tous vos builds sur: https://expo.dev/accounts/[VOTRE_COMPTE]/projects/test-mobile/builds
+
+3. Téléchargez l'APK sur votre smartphone Android
+
+4. Activez l'installation depuis des sources inconnues dans les paramètres Android
+
+5. Ouvrez le fichier APK téléchargé pour l'installer
+
+### Build iOS (nécessite un compte Apple Developer)
+
+```bash
+eas build -p ios --profile production
+```
+
+Note: Pour iOS, vous aurez besoin d'un compte Apple Developer payant (99$/an) et de certificats de signature.
+
+### Vérifier les builds existants
+
+```bash
+eas build:list
+```
+
+Ou consultez directement sur le dashboard: https://expo.dev
+
 ## Architecture Technique
 
 ### Technologies utilisées
